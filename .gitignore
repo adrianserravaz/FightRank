@@ -1,0 +1,26 @@
+.DS_Store
+Thumbs.db
+
+# Local WordPress/runtime files
+wp-config.php
+.htaccess
+local-xdebuginfo.php
+
+# Dependencies and build artifacts
+node_modules/
+vendor/
+dist/
+build/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.zip
+
+# IDE/editor metadata
+.idea/
+.vscode/
+
+# Windows/PowerShell cache sometimes created during local tooling runs
+Microsoft/
