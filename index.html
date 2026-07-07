@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FightRank | WordPress UFC Rankings Plugin</title>
+  <meta name="description" content="FightRank es un plugin WordPress para rankings UFC, puntuacion automatica, importacion de datos, AJAX y valoraciones de usuario.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101114;
+      --panel: #181a20;
+      --text: #f4f4f5;
+      --muted: #b8beca;
+      --line: #2a2e38;
+      --gold: #f0c85a;
+      --red: #d94141;
+      --blue: #5aa7ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(217, 65, 65, .16), transparent 36rem),
+        linear-gradient(135deg, #101114 0%, #171922 48%, #111318 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      background: rgba(16, 17, 20, .76);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    nav {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .brand span {
+      color: var(--red);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: calc(100vh - 68px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: 42px;
+      align-items: center;
+      padding: 64px 0 40px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: .82rem;
+      letter-spacing: 0;
+      margin: 0 0 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 6.8rem);
+      line-height: .9;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      margin: 24px 0 0;
+      max-width: 64ch;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-weight: 800;
+      background: var(--text);
+      color: #111318;
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--text);
+    }
+
+    .showcase {
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(24, 26, 32, .82);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, .32);
+    }
+
+    .score-card {
+      padding: 26px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(217, 65, 65, .28), rgba(240, 200, 90, .12)),
+        var(--panel);
+    }
+
+    .fight-label {
+      color: var(--muted);
+      font-size: .86rem;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .fight-title {
+      margin: 8px 0 18px;
+      font-size: 1.8rem;
+      line-height: 1.08;
+      font-weight: 900;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .score {
+      width: 92px;
+      aspect-ratio: 1;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--gold);
+      background: rgba(0, 0, 0, .26);
+    }
+
+    .bars {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .1);
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--gold));
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .feature {
+      background: rgba(16, 17, 20, .9);
+      padding: 22px;
+    }
+
+    .feature strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .feature span {
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    section {
+      padding: 72px 0;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    h2 {
+      margin: 0 0 24px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .tile {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: rgba(24, 26, 32, .72);
+      min-height: 150px;
+    }
+
+    .tile h3 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+    }
+
+    .tile p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .04);
+      font-weight: 700;
+      font-size: .92rem;
+    }
+
+    footer {
+      padding: 34px 0;
+      color: var(--muted);
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 44px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      nav {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 16px 0;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .score-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="wrap" aria-label="Navegacion principal">
+      <a class="brand" href="#top">Fight<span>Rank</span></a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#tech">Stack</a>
+        <a href="https://github.com/adrianserravaz/FightRank">GitHub</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <div class="wrap hero">
+      <div>
+        <p class="eyebrow">WordPress plugin portfolio</p>
+        <h1>FightRank</h1>
+        <p class="lead">
+          Plugin de WordPress para catalogar peleas, peleadores y eventos UFC, con puntuacion automatica,
+          valoraciones de usuarios, importacion de datos publicos y plantillas frontend personalizadas.
+        </p>
+        <div class="actions">
+          <a class="btn" href="https://github.com/adrianserravaz/FightRank">Ver codigo</a>
+          <a class="btn secondary" href="#features">Ver capacidades</a>
+        </div>
+      </div>
+
+      <aside class="showcase" aria-label="Resumen visual FightRank">
+        <div class="score-card">
+          <span class="fight-label">FightRank score</span>
+          <h2 class="fight-title">Puntuacion automatica basada en datos de combate</h2>
+          <div class="score-row">
+            <div class="score">9.4</div>
+            <div class="bars">
+              <div class="bar">
+                Metodo y round
+                <div class="track"><div class="fill" style="width: 94%"></div></div>
+              </div>
+              <div class="bar">
+                Knockdowns y golpes
+                <div class="track"><div class="fill" style="width: 82%"></div></div>
+              </div>
+              <div class="bar">
+                Valoracion usuarios
+                <div class="track"><div class="fill" style="width: 88%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="features">
+          <div class="feature"><strong>Custom Post Types</strong><span>Peleas, peleadores y eventos.</span></div>
+          <div class="feature"><strong>AJAX Ratings</strong><span>Votos de usuarios con nonce.</span></div>
+          <div class="feature"><strong>CSV Importer</strong><span>Importacion por lotes desde fuentes publicas.</span></div>
+          <div class="feature"><strong>Templates</strong><span>Archivos, perfiles y detalle de pelea.</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <section id="features">
+      <div class="wrap">
+        <h2>Que demuestra</h2>
+        <div class="grid">
+          <article class="tile">
+            <h3>Modelado en WordPress</h3>
+            <p>Registra entidades propias, taxonomias, metadatos y vistas frontend para un dominio deportivo.</p>
+          </article>
+          <article class="tile">
+            <h3>Logica backend</h3>
+            <p>Calcula una nota FightRank combinando metodo, round, knockdowns, golpes, sumisiones y contexto.</p>
+          </article>
+          <article class="tile">
+            <h3>Interaccion segura</h3>
+            <p>Gestiona valoraciones con AJAX, usuarios autenticados, validacion de nonce y persistencia en tabla propia.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="tech">
+      <div class="wrap">
+        <h2>Stack tecnico</h2>
+        <div class="stack" aria-label="Tecnologias usadas">
+          <span class="chip">WordPress</span>
+          <span class="chip">PHP</span>
+          <span class="chip">MySQL</span>
+          <span class="chip">JavaScript</span>
+          <span class="chip">jQuery</span>
+          <span class="chip">AJAX</span>
+          <span class="chip">HTML Templates</span>
+          <span class="chip">CSS Responsive</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Demo estatica desplegable en Vercel. El codigo completo del plugin WordPress esta disponible en GitHub.
+    </div>
+  </footer>
+</body>
+</html>
